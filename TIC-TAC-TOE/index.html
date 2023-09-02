@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #e0ccdf; /* Light purple background color for the webpage */
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        h1 {
+            color: #333; /* Dark gray text color for the title */
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 36px;
+            border: 2px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #eee; /* Light gray background for cells */
+            color: #4a90e2; /* Blue color for "X" */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .cell.clicked {
+            cursor: not-allowed;
+        }
+        .cell:hover {
+            background-color: #ccc; /* Slightly darker gray on hover */
+        }
+        .cell.x {
+            color: #f44336; /* Red color for "X" */
+        }
+        .cell.o {
+            color: #4caf50; /* Green color for "O" */
+        }
+        #message {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .player1-wins, .player2-wins {
+            font-size: 36px;
+            background-color: #4caf50; /* Green background for Player 1 wins */
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+            color: #fff; /* White text color for Player 1 wins */
+        }
+        .player2-wins {
+            background-color: #f44336; /* Red background for Player 2 wins */
+            color: #fff; /* White text color for Player 2 wins */
+        }
+        .win-animation {
+            animation: blink 1s linear infinite;
+        }
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        #reset-button {
+            background-color: #4caf50; /* Green color for the Reset button */
+            color: #fff; /* White text color for the Reset button */
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #reset-button:hover {
+            background-color: #45a049; /* Darker green color on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div id="board"></div>
+    <div id="message"></div>
+    <div class="player1-wins">Player 1 wins!</div>
+    <div class="player2-wins">Player 2 wins!</div>
+    <button id="reset-button">Reset</button>
+    <script>
+        const board = document.getElementById("board");
+        const message = document.getElementById("message");
+        const player1Wins = document.querySelector(".player1-wins");
+        const player2Wins = document.querySelector(".player2-wins");
+        const cells = Array.from({ length: 9 });
+        const resetButton = document.getElementById("reset-button");
+
+        let currentPlayer = "X";
+        let gameOver = false;
+
+        // Create the game board
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.dataset.index = i;
+            cell.addEventListener("click", handleCellClick);
+            board.appendChild(cell);
+            cells[i] = cell;
+        }
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            const index = cell.dataset.index;
+
+            if (gameOver || cell.classList.contains("clicked")) {
+                return;
+            }
+
+            cell.textContent = currentPlayer;
+            cell.classList.add("clicked", currentPlayer.toLowerCase());
+
+            if (checkWin()) {
+                message.textContent = "";
+                player1Wins.style.display = currentPlayer === "X" ? "block" : "none";
+                player2Wins.style.display = currentPlayer === "O" ? "block" : "none";
+                gameOver = true;
+            } else if (cells.every(cell => cell.classList.contains("clicked"))) {
+                message.textContent = "It's a draw!";
+                gameOver = true;
+            } else {
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+        }
+
+        function checkWin() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            return winPatterns.some(pattern => {
+                const [a, b, c] = pattern;
+                return cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent;
+            });
+        }
+
+        // Reset the game
+        resetButton.addEventListener("click", () => {
+            cells.forEach(cell => {
+                cell.textContent = "";
+                cell.classList.remove("clicked", "x", "o");
+            });
+            message.textContent = "";
+            player1Wins.style.display = "none";
+            player2Wins.style.display = "none";
+            currentPlayer = "X";
+            gameOver = false;
+        });
+    </script>
+</body>
+</html>
